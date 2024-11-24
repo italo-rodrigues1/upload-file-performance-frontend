@@ -104,8 +104,6 @@ export default function InputFiles() {
       const validationProcessActive = progress.filter(
         (item) => item.percentage < 100
       );
-      console.log("validationProcessActive", validationProcessActive);
-
       return validationProcessActive?.length > 0;
     }
     return false;
