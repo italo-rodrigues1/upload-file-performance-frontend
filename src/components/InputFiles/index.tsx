@@ -1,7 +1,6 @@
 "use client";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import Resumable from "resumablejs";
 
 interface IFile {
   path: string;
@@ -75,13 +74,13 @@ export default function InputFiles() {
           worker.terminate();
         }
       };
-
       setProgress((prevProgress) => [
         ...prevProgress,
         { fileName: file.name, percentage: 0 },
       ]);
     });
   };
+
   const convertBytes = (bytes: number) => {
     const units = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     let unitIndex = 0;
@@ -95,6 +94,23 @@ export default function InputFiles() {
   const getTotalBytes = useMemo(() => {
     return files.reduce((sum, file) => sum + file.size, 0);
   }, [files]);
+
+  const validationFileProgress = useMemo(() => {
+    if (files.length === 0) {
+      return true;
+    }
+
+    if (progress.length) {
+      const validationProcessActive = progress.filter(
+        (item) => item.percentage < 100
+      );
+      console.log("validationProcessActive", validationProcessActive);
+
+      return validationProcessActive?.length > 0;
+    }
+    return false;
+  }, [progress, files]);
+
   const removedFiles = () => {
     setFiles([]);
     setProgress([]);
@@ -133,16 +149,16 @@ export default function InputFiles() {
       </aside>
 
       <div className="flex gap-[10px]">
-      <button
-        type="button"
+        <button
+          type="button"
           disabled={validationFileProgress}
           className={`${
             validationFileProgress
               ? "bg-disabled-button-rgba hover:none cursor-auto"
               : "bg-blue-500 hover:bg-blue-700 cursor-pointer"
           } text-white font-bold py-2 px-4 rounded mt-4`}
-        onClick={sendFiles}
-      >
+          onClick={sendFiles}
+        >
           Enviar Arquivos
         </button>
         {files.length > 0 && (
@@ -157,7 +173,7 @@ export default function InputFiles() {
             onClick={removedFiles}
           >
             Remover Arquivos
-      </button>
+          </button>
         )}
       </div>
     </>
