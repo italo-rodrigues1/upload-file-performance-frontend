@@ -82,6 +82,19 @@ export default function InputFiles() {
       ]);
     });
   };
+  const convertBytes = (bytes: number) => {
+    const units = ["bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+    let unitIndex = 0;
+    while (bytes >= 1024 && unitIndex < units.length - 1) {
+      bytes /= 1024;
+      unitIndex++;
+    }
+    return `${bytes.toFixed(2)} ${units[unitIndex]}`;
+  };
+
+  const getTotalBytes = useMemo(() => {
+    return files.reduce((sum, file) => sum + file.size, 0);
+  }, [files]);
   const removedFiles = () => {
     setFiles([]);
     setProgress([]);
@@ -95,19 +108,23 @@ export default function InputFiles() {
       >
         <div className="h-[100%] w-[100%] flex items-center justify-center">
           <input {...getInputProps()} />
-          <p>Arraste ou clique aqui para enviar seus arquivos</p>
+          <p className="text-center m-1]">
+            Arraste ou clique aqui para enviar seus arquivos
+          </p>
         </div>
       </section>
-      <aside className="h-[200px] w-[100%] mt-4">
-        <h4>Arquivos:</h4>
-        <ul className="w-[100%] flex flex-col items-start justify-start">
+      <aside className="h-[400px] w-[100%] mt-4 flex flex-col gap-[10px]">
+        <p>
+          Arquivos: {files.length} | {convertBytes(getTotalBytes)}
+        </p>
+        <ul className=" max-h-[100%] w-[100%] flex flex-col items-start justify-start overflow-auto scroll-smooth">
           {files.map((file) => {
             const fileProgress = progress.find(
               (item) => item.fileName === file.name
             );
             return (
               <li key={file.path} className="w-[100%]">
-                {file.name} - {file.size} bytes -{" "}
+                {file.name} - {convertBytes(file.size)} -{" "}
                 {fileProgress ? fileProgress.percentage : 0}%
               </li>
             );
