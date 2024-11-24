@@ -82,6 +82,10 @@ export default function InputFiles() {
       ]);
     });
   };
+  const removedFiles = () => {
+    setFiles([]);
+    setProgress([]);
+  };
 
   return (
     <>
@@ -111,14 +115,34 @@ export default function InputFiles() {
         </ul>
       </aside>
 
+      <div className="flex gap-[10px]">
       <button
         type="button"
-        disabled={files.length === 0}
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
+          disabled={validationFileProgress}
+          className={`${
+            validationFileProgress
+              ? "bg-disabled-button-rgba hover:none cursor-auto"
+              : "bg-blue-500 hover:bg-blue-700 cursor-pointer"
+          } text-white font-bold py-2 px-4 rounded mt-4`}
         onClick={sendFiles}
       >
-        Enviar arquivos
+          Enviar Arquivos
+        </button>
+        {files.length > 0 && (
+          <button
+            type="button"
+            disabled={validationFileProgress}
+            className={`${
+              validationFileProgress
+                ? "bg-disabled-button-rgba hover:none cursor-auto text-white"
+                : "bg-white cursor-pointer text-black"
+            } font-bold py-2 px-4 rounded mt-4`}
+            onClick={removedFiles}
+          >
+            Remover Arquivos
       </button>
+        )}
+      </div>
     </>
   );
 }
