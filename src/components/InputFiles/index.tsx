@@ -15,6 +15,7 @@ interface IFile {
 interface IProgress {
   fileName: string;
   percentage: number;
+  error: boolean;
 }
 
 export default function InputFiles() {
@@ -36,7 +37,7 @@ export default function InputFiles() {
     }
 
     files.forEach((file) => {
-      const chunkSize = 2 * 1024 * 1024; // 2MB
+      const chunkSize = 5 * 1024 * 1024; // 5MB
       const worker = new Worker("/workers/uploadWorker.js"); // Caminho relativo na pasta `public`
 
       const fileData = {
@@ -64,9 +65,14 @@ export default function InputFiles() {
             )
           );
         }
-
         if (error) {
-          console.error(error);
+          console.error(`Erro no:`, error);
+
+          setProgress((prevProgress) =>
+            prevProgress.map((item) =>
+              item.fileName === file.name ? { ...item, error: true } : item
+            )
+          );
         }
 
         if (completed) {
@@ -76,7 +82,7 @@ export default function InputFiles() {
       };
       setProgress((prevProgress) => [
         ...prevProgress,
-        { fileName: file.name, percentage: 0 },
+        { fileName: file.name, error: false, percentage: 0 },
       ]);
     });
   };
@@ -139,7 +145,10 @@ export default function InputFiles() {
             return (
               <li key={file.path} className="w-[100%]">
                 {file.name} - {convertBytes(file.size)} -{" "}
-                {fileProgress ? fileProgress.percentage : 0}%
+                {fileProgress && fileProgress.error
+                  ? "Upload com erro"
+                  : `Upload em andamento (${fileProgress?.percentage || 0}%)`}
+                {/* {fileProgress ? fileProgress.percentage : 0}% */}
               </li>
             );
           })}
