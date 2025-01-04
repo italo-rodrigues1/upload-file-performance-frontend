@@ -38,7 +38,9 @@ export default function InputFiles() {
 
     files.forEach((file) => {
       const chunkSize = 5 * 1024 * 1024; // 5MB
-      const worker = new Worker("/workers/uploadWorker.js"); // Caminho relativo na pasta `public`
+      const worker = new Worker(
+        new URL("../../workers/uploadWorker.ts", import.meta.url)
+      );
 
       const fileData = {
         name: file.name,
@@ -46,11 +48,11 @@ export default function InputFiles() {
         lastModified: file.lastModified,
         content: file,
       };
-
+      
       worker.postMessage({
         fileData,
         chunkSize,
-        url: "http://localhost:3001/uploads",
+        url: process.env.NEXT_PUBLIC_URL,
       });
 
       worker.onmessage = (event) => {
@@ -80,6 +82,7 @@ export default function InputFiles() {
           worker.terminate();
         }
       };
+
       setProgress((prevProgress) => [
         ...prevProgress,
         { fileName: file.name, error: false, percentage: 0 },

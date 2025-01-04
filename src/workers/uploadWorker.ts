@@ -1,21 +1,21 @@
 self.onmessage = async (event) => {
-  const delay = async (ms) => {
+  const delay = async (ms: number) => {
     return await new Promise((resolve) => setTimeout(resolve, ms));
   };
 
   const { fileData, chunkSize, url } = event.data;
   const MAX_RETRIES = 10;
-
+  console.log(url);
   // Reconstruir o arquivo a partir dos dados enviados
   const reconstructedFile = new File([fileData.content], fileData.name, {
     type: fileData.type,
     lastModified: fileData.lastModified,
   });
 
-  const totalChunks = Math.ceil(reconstructedFile.size / chunkSize);
+  const totalChunks: any = Math.ceil(reconstructedFile.size / chunkSize);
   let currentChunk = 0;
 
-  const sendChunk = async (chunkNumber, chunk) => {
+  const sendChunk = async (chunkNumber: any, chunk: any) => {
     const formData = new FormData();
     formData.append("file", chunk);
     formData.append("chunkNumber", chunkNumber);
@@ -75,7 +75,7 @@ self.onmessage = async (event) => {
     }
 
     postMessage({ completed: true }); // Indica que o upload foi concluído
-  } catch (error) {
+  } catch (error: any) {
     postMessage({
       error: `Erro no upload: ${error.message}`,
       completed: false,
